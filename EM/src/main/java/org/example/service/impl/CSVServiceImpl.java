@@ -54,12 +54,12 @@ public class CSVServiceImpl implements CSVService {
                 System.out.println(csv);
                 // add nó vào trong DB ở đây
             }
-            extractExcelFiel(csvs, folderPath);
+            extractExcelFile(csvs, folderPath);
         }catch (IOException e) {
             log.info(e);
         }
     }
-    public void extractExcelFiel(List<CSV> csvs, String pathFolder) {
+    public void extractExcelFile(List<CSV> csvs, String pathFolder) {
         // Tạo file Excel
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("My Sheet");
