@@ -28,21 +28,22 @@ public class CSVServiceImpl implements CSVService {
         String folderPath = "./csvFile";
         File folder = new File(folderPath);
         File[] files = folder.listFiles();
-        if(files != null) {
-            for(File file : files) {
-                if(file.isFile() && file.getName().endsWith(".csv")) {
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile() && file.getName().endsWith(".csv")) {
                     System.out.println(file.getName());
                     readCSVFile(file, folderPath);
                 }
             }
         }
     }
+
     public void readCSVFile(File file, String folderPath) {
         try {
             FileReader reader = new FileReader(file);
             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT);
             List<CSV> csvs = new ArrayList<>();
-            for(CSVRecord csvRecord : csvParser) {
+            for (CSVRecord csvRecord : csvParser) {
                 CSV csv = new CSV();
                 csv.setFirstName(csvRecord.get(0));
                 csv.setLastName(csvRecord.get(1));
@@ -55,10 +56,11 @@ public class CSVServiceImpl implements CSVService {
                 // add nó vào trong DB ở đây
             }
             extractExcelFile(csvs, folderPath);
-        }catch (IOException e) {
+        } catch (IOException e) {
             log.info(e);
         }
     }
+
     public void extractExcelFile(List<CSV> csvs, String pathFolder) {
         // Tạo file Excel
         try (Workbook workbook = new XSSFWorkbook()) {
@@ -71,36 +73,31 @@ public class CSVServiceImpl implements CSVService {
             }
             // Tạo một trang tính mới
             int index = 1;
-            for(CSV csv : csvs) {
+            for (CSV csv : csvs) {
                 // Tạo một hàng mới
+                int bodyInd = 0;
                 Row body = sheet.createRow(index++);
+                String[] bodyDetail = {csv.getFirstName(), csv.getLastName(), csv.getAddress(),
+                        csv.getSpecificAdd(), csv.getCity(), csv.getPostCode()};
                 // Tạo các ô trong hàng
-                Cell cell1 = body.createCell(0);
-                cell1.setCellValue(csv.getFirstName());
-                Cell cell2 = body.createCell(1);
-                cell2.setCellValue(csv.getLastName());
-                Cell cell3 = body.createCell(2);
-                cell3.setCellValue(csv.getAddress());
-                Cell cell4 = body.createCell(3);
-                cell4.setCellValue(csv.getSpecificAdd());
-                Cell cell5 = body.createCell(4);
-                cell5.setCellValue(csv.getCity());
-                Cell cell6 = body.createCell(5);
-                cell6.setCellValue(csv.getPostCode());
+                for (int j = 0; j < bodyDetail.length; j++) {
+                    Cell cell = body.createCell(j);
+                    cell.setCellValue(bodyDetail[j]);
+                }
             }
             // Lặp qua các hàng và các ô để kiểm tra dữ liệu và áp dụng định dạng
-            for(int rowNum = 0; rowNum <= sheet.getLastRowNum(); rowNum++) {
+            for (int rowNum = 0; rowNum <= sheet.getLastRowNum(); rowNum++) {
                 Row currentRow = sheet.getRow(rowNum);
-                if(currentRow != null) {
-                    for(int colNum = 0; colNum < currentRow.getLastCellNum(); colNum++) {
+                if (currentRow != null) {
+                    for (int colNum = 0; colNum < currentRow.getLastCellNum(); colNum++) {
                         Cell currentCell = currentRow.getCell(colNum);
-                        if(currentCell != null && !currentCell.getStringCellValue().isEmpty()) {
+                        if (currentCell != null && !currentCell.getStringCellValue().isEmpty()) {
                             CellStyle style = workbook.createCellStyle();
                             style.setBorderTop(BorderStyle.THIN);
                             style.setBorderBottom(BorderStyle.THIN);
                             style.setBorderLeft(BorderStyle.THIN);
                             style.setBorderRight(BorderStyle.THIN);
-                            if(rowNum == 0) {
+                            if (rowNum == 0) {
                                 Font font = workbook.createFont();
                                 font.setBold(true);
                                 style.setFont(font);
